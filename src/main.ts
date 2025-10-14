@@ -1,0 +1,20 @@
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import router from './router'
+import App from './App.vue'
+import './style.css'
+
+/**
+ * 创建Vue应用实例
+ * 使用Pinia进行状态管理，Vue Router进行路由管理
+ */
+const app = createApp(App)
+
+// 安装Pinia状态管理
+app.use(createPinia())
+
+// 安装Vue Router路由管理
+app.use(router)
+
+// 挂载应用到DOM
+app.mount('#app')
