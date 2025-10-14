@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "npx vue-tsc && npx vite build",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "npx vue-tsc --noEmit"
   },
   "dependencies": {
     "pinia": "^2.3.1",
