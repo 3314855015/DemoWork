@@ -1,6 +1,6 @@
-# Vue 脚手架项目
+# 历史人物展示平台
 
-这是一个基于 **Vue 3 + TypeScript + Vite** 构建的现代化脚手架项目，遵循 Vue.js 最佳实践，提供完整的开发解决方案。
+基于 Vue 3 + TypeScript + Vite + Supabase 构建的现代化历史人物展示平台。
 
 ## ✨ 特性
 
@@ -13,6 +13,9 @@
 - 🌙 **主题切换** - 支持浅色/深色主题
 - 📱 **移动端友好** - 完整的移动端适配
 - 🔧 **开发工具** - ESLint、TypeScript 检查等
+- 🗄️ **Supabase** - 实时数据库和用户认证
+- 🔍 **智能搜索** - 向量相似度搜索功能
+- 💾 **数据管理** - 完整的历史人物数据系统
 
 ## 🏗️ 项目架构
 
@@ -31,19 +34,31 @@ poem/
 │   │   ├── MessageInput.vue   # 消息输入组件
 │   │   ├── PageTitle.vue      # 页面标题组件
 │   │   ├── WelcomeSection.vue # 欢迎区域组件
-│   │   └── LoadingSpinner.vue # 加载指示器
+│   │   ├── LoadingSpinner.vue # 加载指示器
+│   │   └── FigureCard.vue     # 历史人物卡片组件
 │   ├── views/              # 页面组件
 │   │   ├── Home.vue           # 首页
 │   │   ├── Counter.vue        # 计数器页面
-│   │   └── About.vue          # 关于页面
+│   │   ├── About.vue          # 关于页面
+│   │   ├── History.vue        # 历史人物页面
+│   │   └── FigureDetail.vue   # 人物详情页面
 │   ├── stores/             # Pinia 状态管理
 │   │   ├── app.ts             # 应用全局状态
-│   │   └── counter.ts         # 计数器状态
+│   │   ├── counter.ts         # 计数器状态
+│   │   └── history.ts         # 历史人物状态
+│   ├── lib/                # 工具函数和配置
+│   │   ├── supabase.ts        # Supabase 客户端配置
+│   │   ├── database.types.ts   # 数据库类型定义
+│   │   ├── history-service.ts  # 历史人物服务
+│   │   └── ai-service.ts       # AI 服务
 │   ├── router/             # 路由配置
 │   │   └── index.ts           # 路由定义和守卫
 │   ├── App.vue             # 根组件
 │   ├── main.ts             # 应用入口
 │   └── style.css           # 全局样式
+├── supabase/              # 数据库配置
+│   ├── migrations/          # 数据库迁移文件
+│   └── seed_data.sql        # 示例数据
 ├── index.html              # HTML 模板
 ├── package.json            # 项目配置和依赖
 ├── tsconfig.json           # TypeScript 配置
@@ -59,12 +74,32 @@ poem/
 
 - Node.js >= 16.0.0
 - npm >= 7.0.0
+- Supabase 账户
 
 ### 安装依赖
 
 ```bash
 npm install
 ```
+
+### 环境配置
+
+复制 `.env.example` 为 `.env` 并配置你的 Supabase 信息：
+```bash
+cp .env.example .env
+```
+
+编辑 `.env` 文件：
+```env
+VITE_SUPABASE_URL=你的 Supabase 项目 URL
+VITE_SUPABASE_ANON_KEY=你的 Supabase Anon Key
+```
+
+### 数据库设置
+
+1. 在 Supabase 控制台创建新项目
+2. 执行 `supabase/migrations/001_create_historical_figures.sql` 创建表结构
+3. 执行 `supabase/seed_data.sql` 插入示例数据
 
 ### 启动开发服务器
 
@@ -94,6 +129,12 @@ npm run build
 npm run preview
 ```
 
+### Vercel 部署
+
+1. 连接 GitHub 仓库到 Vercel
+2. 配置环境变量
+3. 自动部署
+
 ## 📚 功能说明
 
 ### 🏠 首页 (Home)
@@ -114,6 +155,25 @@ npm run preview
 - **状态管理**: 使用 Pinia 管理计数器状态
 - **组件**: `CounterDisplay`、`CounterControls`、`MessageInput`
 
+### 📚 历史人物页面 (History)
+- **用途**: 展示历史人物列表和搜索功能
+- **功能**:
+  - 历史人物列表展示
+  - 智能搜索和筛选
+  - 分类浏览
+  - 收藏功能
+- **状态管理**: 使用 Pinia 管理历史人物状态
+- **组件**: `FigureCard`、搜索组件
+
+### 👤 人物详情页面 (FigureDetail)
+- **用途**: 展示单个历史人物的详细信息
+- **功能**:
+  - 完整人物信息展示
+  - 相关人物推荐
+  - 用户收藏管理
+  - 分享功能
+- **数据**: 从 Supabase 实时获取数据
+
 ### 📖 关于页面 (About)
 - **用途**: 展示项目技术栈、架构和特性
 - **功能**:
@@ -133,6 +193,19 @@ npm run preview
 - **主题切换**: 支持浅色/深色主题
 - **响应式**: 所有组件适配不同主题
 - **持久化**: 主题选择可扩展为本地存储
+
+### 🗄️ 数据管理系统
+- **Supabase 集成**: 实时数据库和用户认证
+- **类型安全**: 自动生成的数据库类型定义
+- **向量搜索**: 支持智能相似度搜索
+- **用户收藏**: 完整的用户收藏功能
+- **数据关系**: 人物关系网络展示
+
+### 🔍 搜索功能
+- **关键词搜索**: 传统文本搜索
+- **向量搜索**: AI驱动的语义搜索
+- **多条件筛选**: 按时期、职业等筛选
+- **实时结果**: 搜索结果即时更新
 
 ## 🛠️ 开发指南
 
@@ -211,6 +284,29 @@ npm run preview
    - 详细的代码注释
    - 统一的代码风格
 
+## 🚀 部署指南
+
+### Vercel 部署
+1. 将代码推送到 GitHub 仓库
+2. 在 Vercel 中导入项目
+3. 配置环境变量：
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. 部署并测试功能
+
+### Supabase 配置
+确保启用以下功能：
+- **行级安全策略 (RLS)**: 保护数据安全
+- **用户认证**: 支持用户注册登录
+- **存储桶权限**: 图片上传和访问控制
+- **向量扩展**: 启用 `vector` 扩展支持智能搜索
+
+### 数据库迁移
+1. 在 Supabase SQL 编辑器中执行迁移文件
+2. 插入示例数据测试功能
+3. 配置适当的 RLS 策略
+4. 测试 API 接口
+
 ## 🚀 扩展建议
 
 1. **测试集成**: 添加 Vitest 单元测试
@@ -218,7 +314,9 @@ npm run preview
 3. **状态持久化**: 添加 localStorage 支持
 4. **国际化**: 集成 Vue I18n
 5. **PWA**: 添加 Service Worker 支持
-6. **部署**: 配置 CI/CD 流水线
+6. **AI 增强**: 集成更多 AI 功能
+7. **社交功能**: 添加评论和分享功能
+8. **数据分析**: 用户行为分析
 
 ## 📄 技术栈详情
 

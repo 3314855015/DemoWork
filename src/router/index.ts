@@ -37,6 +37,14 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '历史名人志'
     }
+  },
+  {
+    path: '/figure/:id',
+    name: 'FigureDetail',
+    component: () => import('@/views/FigureDetail.vue'),
+    meta: {
+      title: '人物详情'
+    }
   }
 ]
 

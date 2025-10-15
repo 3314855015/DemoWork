@@ -107,6 +107,12 @@ dist
 
 # Vite
 .vite
+vite.config.ts.timestamp-*
+vite.config.ts.timestamp-*
+
+# Vue/TypeScript specific
+*.vue.ts
+*.vue.js
 
 # IDE
 .vscode/
@@ -144,15 +150,40 @@ out/
 # Vercel
 .vercel
 
-# Supabase (if using)
+# Supabase
 .supabase/
+supabase/.temp/
+supabase/.wrangler/
+supabase/functions/_types/
+supabase/functions/deno.lock
 
-# AI/ML models (if any)
+# AI/ML models and embeddings
 *.pkl
 *.h5
 *.pt
 *.onnx
+*.emb
+embeddings/
+models/
+
+# Historical figures project specific
+# Local database backups
+*.backup
+*.dump
+
+# Image cache/thumbnails
+thumbnails/
+cache/
 
 # Temporary files
 *.tmp
 *.temp
+.tmp/
+
+# Local development certificates
+*.pem
+*.key
+*.crt
+
+# Browser cache
+.vite/
