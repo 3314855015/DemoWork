@@ -1,7 +1,5 @@
 <template>
   <div class="figure-detail-page">
-    <AppHeader />
-    
     <main class="main-content" v-if="figure">
       <!-- 返回按钮 -->
       <div class="container">
@@ -173,7 +171,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHistoryStore } from '@/stores/history'
 import { useAuthStore } from '@/stores/auth'
-import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import type { Database } from '@/lib/database.types'
