@@ -1,8 +1,5 @@
 <template>
   <div class="history-page">
-    <!-- 使用应用导航栏 -->
-    <AppHeader />
-    
     <!-- 主要内容区域 -->
     <main class="main-content">
       <!-- Hero Section -->
