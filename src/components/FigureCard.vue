@@ -2,7 +2,7 @@
   <div class="figure-card" @click="$emit('click', figure)">
     <div class="figure-image">
       <img 
-        :src="figure.image_url || '/placeholder-figure.jpg'" 
+        :src="figure.image_url || '/images/placeholder-figure.svg'" 
         :alt="figure.name"
         @error="handleImageError"
       >
@@ -35,7 +35,7 @@
       </p>
       
       <div class="figure-actions">
-        <button class="btn-primary" @click.stop="$emit('view-details', figure)">
+        <button class="btn-primary" @click.stop="$emit('viewDetails', figure)">
           查看详情
         </button>
       </div>
@@ -64,7 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   click: [figure: Figure]
-  viewDetails: [figure: Figure]
+  'viewDetails': [figure: Figure]
 }>()
 
 const historyStore = useHistoryStore()
@@ -79,8 +79,9 @@ const isFavorited = computed(() => {
   return historyStore.favorites.some(fig => fig.id === props.figure.id)
 })
 
-const handleImageError = () => {
-  imageError.value = true
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/images/placeholder-figure.svg'
 }
 
 const toggleFavorite = async () => {

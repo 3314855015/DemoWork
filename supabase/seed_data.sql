@@ -5,15 +5,15 @@
 
 -- 2. 插入历史人物数据（避免与migration中重复的人物）
 INSERT INTO historical_figures (name, alias, birth_year, death_year, period_id, nationality, occupation, achievements, biography, image_url, popularity_score) VALUES
-('秦始皇', ARRAY['嬴政'], -259, -210, (SELECT id FROM historical_periods WHERE name = '古代文明'), '中国', ARRAY['政治家', '军事家'], '统一六国，建立秦朝，统一文字、货币、度量衡，修筑万里长城。', '中国历史上第一个完成大一统的皇帝，建立了中央集权制度。', 'https://example.com/qinshihuang.jpg', 92),
-('汉武帝', ARRAY['刘彻'], -156, -87, (SELECT id FROM historical_periods WHERE name = '古代文明'), '中国', ARRAY['皇帝', '政治家'], '北击匈奴，开辟丝绸之路，独尊儒术，使汉朝达到鼎盛时期。', '西汉第七位皇帝，在位期间开疆拓土，加强中央集权。', 'https://example.com/hanwudi.jpg', 88),
-('诸葛亮', ARRAY['孔明'], 181, 234, (SELECT id FROM historical_periods WHERE name = '古代文明'), '中国', ARRAY['政治家', '军事家', '发明家'], '辅佐刘备建立蜀汉政权，发明木牛流马、诸葛连弩，著有《出师表》等名篇。', '三国时期蜀汉丞相，杰出的政治家、军事家。', 'https://example.com/zhugeliang.jpg', 90),
-('唐太宗', ARRAY['李世民'], 598, 649, (SELECT id FROM historical_periods WHERE name = '中世纪'), '中国', ARRAY['皇帝', '政治家'], '虚心纳谏，任人唯贤，使唐朝成为当时世界上最强大的国家。', '唐朝第二位皇帝，开创"贞观之治"。', 'https://example.com/tangtaizong.jpg', 87),
-('李白', ARRAY['太白'], 701, 762, (SELECT id FROM historical_periods WHERE name = '中世纪'), '中国', ARRAY['诗人', '文学家'], '创作了大量脍炙人口的诗歌作品，如《将进酒》《蜀道难》等。', '唐代伟大的浪漫主义诗人，被誉为"诗仙"。', 'https://example.com/libai.jpg', 85),
-('苏轼', ARRAY['子瞻', '东坡居士'], 1037, 1101, (SELECT id FROM historical_periods WHERE name = '中世纪'), '中国', ARRAY['文学家', '书画家', '政治家'], '诗词、散文、书法、绘画俱佳，代表作有《赤壁赋》《水调歌头》等。', '北宋文学家、书画家，唐宋八大家之一。', 'https://example.com/sushi.jpg', 86),
-('成吉思汗', ARRAY['铁木真'], 1162, 1227, (SELECT id FROM historical_periods WHERE name = '中世纪'), '蒙古', ARRAY['军事家', '政治家'], '统一蒙古各部，建立蒙古帝国，发动大规模西征。', '蒙古帝国建立者，世界历史上著名的军事家。', 'https://example.com/genghiskhan.jpg', 89),
-('朱元璋', ARRAY['重八'], 1328, 1398, (SELECT id FROM historical_periods WHERE name = '近现代'), '中国', ARRAY['皇帝', '军事家'], '推翻元朝统治，建立明朝，实行休养生息政策。', '明朝开国皇帝，出身贫寒的农民起义领袖。', 'https://example.com/zhuyuanzhang.jpg', 84),
-('康熙帝', ARRAY['玄烨'], 1654, 1722, (SELECT id FROM historical_periods WHERE name = '近现代'), '中国', ARRAY['皇帝', '政治家'], '平定三藩之乱，统一台湾，抗击沙俄侵略，编纂《康熙字典》。', '清朝第四位皇帝，在位时间最长的中国皇帝。', 'https://example.com/kangxi.jpg', 83);
+('秦始皇', ARRAY['嬴政'], -259, -210, (SELECT id FROM historical_periods WHERE name = '古代文明'), '中国', ARRAY['政治家', '军事家'], '统一六国，建立秦朝，统一文字、货币、度量衡，修筑万里长城。', '中国历史上第一个完成大一统的皇帝，建立了中央集权制度。', 'https://ai-public.mastergo.com/ai/img_res/qinshihuang_ai_portrait.jpg', 92),
+('汉武帝', ARRAY['刘彻'], -156, -87, (SELECT id FROM historical_periods WHERE name = '古代文明'), '中国', ARRAY['皇帝', '政治家'], '北击匈奴，开辟丝绸之路，独尊儒术，使汉朝达到鼎盛时期。', '西汉第七位皇帝，在位期间开疆拓土，加强中央集权。', 'https://ai-public.mastergo.com/ai/img_res/hanwudi_ai_portrait.jpg', 88),
+('诸葛亮', ARRAY['孔明'], 181, 234, (SELECT id FROM historical_periods WHERE name = '古代文明'), '中国', ARRAY['政治家', '军事家', '发明家'], '辅佐刘备建立蜀汉政权，发明木牛流马、诸葛连弩，著有《出师表》等名篇。', '三国时期蜀汉丞相，杰出的政治家、军事家。', 'https://ai-public.mastergo.com/ai/img_res/zhugeliang_ai_portrait.jpg', 90),
+('唐太宗', ARRAY['李世民'], 598, 649, (SELECT id FROM historical_periods WHERE name = '中世纪'), '中国', ARRAY['皇帝', '政治家'], '虚心纳谏，任人唯贤，使唐朝成为当时世界上最强大的国家。', '唐朝第二位皇帝，开创"贞观之治"。', 'https://ai-public.mastergo.com/ai/img_res/tangtaizong_ai_portrait.jpg', 87),
+('李白', ARRAY['太白'], 701, 762, (SELECT id FROM historical_periods WHERE name = '中世纪'), '中国', ARRAY['诗人', '文学家'], '创作了大量脍炙人口的诗歌作品，如《将进酒》《蜀道难》等。', '唐代伟大的浪漫主义诗人，被誉为"诗仙"。', 'https://ai-public.mastergo.com/ai/img_res/libai_ai_portrait.jpg', 85),
+('苏轼', ARRAY['子瞻', '东坡居士'], 1037, 1101, (SELECT id FROM historical_periods WHERE name = '中世纪'), '中国', ARRAY['文学家', '书画家', '政治家'], '诗词、散文、书法、绘画俱佳，代表作有《赤壁赋》《水调歌头》等。', '北宋文学家、书画家，唐宋八大家之一。', 'https://ai-public.mastergo.com/ai/img_res/sushi_ai_portrait.jpg', 86),
+('成吉思汗', ARRAY['铁木真'], 1162, 1227, (SELECT id FROM historical_periods WHERE name = '中世纪'), '蒙古', ARRAY['军事家', '政治家'], '统一蒙古各部，建立蒙古帝国，发动大规模西征。', '蒙古帝国建立者，世界历史上著名的军事家。', 'https://ai-public.mastergo.com/ai/img_res/genghiskhan_ai_portrait.jpg', 89),
+('朱元璋', ARRAY['重八'], 1328, 1398, (SELECT id FROM historical_periods WHERE name = '近现代'), '中国', ARRAY['皇帝', '军事家'], '推翻元朝统治，建立明朝，实行休养生息政策。', '明朝开国皇帝，出身贫寒的农民起义领袖。', 'https://ai-public.mastergo.com/ai/img_res/zhuyuanzhang_ai_portrait.jpg', 84),
+('康熙帝', ARRAY['玄烨'], 1654, 1722, (SELECT id FROM historical_periods WHERE name = '近现代'), '中国', ARRAY['皇帝', '政治家'], '平定三藩之乱，统一台湾，抗击沙俄侵略，编纂《康熙字典》。', '清朝第四位皇帝，在位时间最长的中国皇帝。', 'https://ai-public.mastergo.com/ai/img_res/kangxi_ai_portrait.jpg', 83);
 
 -- 3. 插入人物关系数据（只插入不重复的关系）
 INSERT INTO figure_relationships (figure_id, related_figure_id, relationship_type, description) VALUES

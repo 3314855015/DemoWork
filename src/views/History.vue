@@ -48,7 +48,7 @@
               v-for="figure in historyStore.searchResults"
               :key="figure.id"
               :figure="figure"
-              @view-details="viewFigureDetails"
+              @viewDetails="viewFigureDetails"
             />
           </div>
         </div>
@@ -63,7 +63,7 @@
               v-for="figure in historyStore.popularFigures"
               :key="figure.id"
               :figure="figure"
-              @view-details="viewFigureDetails"
+              @viewDetails="viewFigureDetails"
             />
           </div>
         </div>
@@ -130,7 +130,10 @@ const handleSearch = () => {
 
 // 查看人物详情
 const viewFigureDetails = (figure: any) => {
-  router.push(`/figure/${figure.id}`)
+  router.push(`/figure/${figure.id}`).then(() => {
+    // 确保页面滚动到顶部
+    window.scrollTo(0, 0)
+  })
 }
 
 // 查看时期人物

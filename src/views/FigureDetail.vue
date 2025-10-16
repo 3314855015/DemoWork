@@ -15,7 +15,7 @@
           <div class="header-content">
             <div class="figure-image">
               <img 
-                :src="figure.image_url || '/placeholder-figure.jpg'" 
+                :src="figure.image_url || '/images/placeholder-figure.svg'" 
                 :alt="figure.name"
                 @error="handleImageError"
               />
@@ -108,9 +108,10 @@
                     @click="viewRelatedFigure(related)"
                   >
                     <img 
-                      :src="related.image_url || '/placeholder-figure.jpg'" 
+                      :src="related.image_url || '/images/placeholder-figure.svg'" 
                       :alt="related.name"
                       class="related-image"
+                      @error="handleRelatedImageError"
                     />
                     <div class="related-info">
                       <h4>{{ related.name }}</h4>
@@ -216,7 +217,13 @@ const formatYears = (startYear: number | null, endYear: number | null) => {
 // 处理图片加载错误
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
-  img.src = '/placeholder-figure.jpg'
+  img.src = '/images/placeholder-figure.svg'
+}
+
+// 处理相关人物图片加载错误
+const handleRelatedImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/images/placeholder-figure.svg'
 }
 
 // 切换收藏
@@ -228,7 +235,13 @@ const toggleFavorite = async () => {
 
 // 查看相关人物
 const viewRelatedFigure = (relatedFigure: any) => {
-  router.push(`/figure/${relatedFigure.id}`)
+  if (relatedFigure && relatedFigure.id) {
+    // 使用路由跳转并确保页面滚动到顶部
+    router.push(`/figure/${relatedFigure.id}`).then(() => {
+      // 确保页面滚动到顶部
+      window.scrollTo(0, 0)
+    })
+  }
 }
 
 // 加载人物详情
@@ -492,32 +505,57 @@ onMounted(() => {
   display: flex;
   gap: 1rem;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+  background: white;
 }
 
 .related-figure:hover {
-  background: #f7fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+  border-color: #cbd5e0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .related-image {
   width: 60px;
   height: 60px;
-  border-radius: 8px;
+  border-radius: 10px;
   object-fit: cover;
+  border: 2px solid #e2e8f0;
+  transition: border-color 0.3s ease;
+}
+
+.related-figure:hover .related-image {
+  border-color: #667eea;
+}
+
+.related-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .related-info h4 {
   margin: 0 0 0.25rem 0;
   font-weight: 600;
   color: #2d3748;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.related-figure:hover .related-info h4 {
+  color: #667eea;
 }
 
 .related-info p {
   margin: 0;
   color: #718096;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 /* 时期信息 */

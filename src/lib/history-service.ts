@@ -198,11 +198,31 @@ export class HistoryService {
 
   // 更新人物热度
   static async incrementPopularity(figureId: string) {
-    const { data, error } = await supabase.rpc('increment_figure_popularity', {
-      figure_id: figureId
-    })
+    try {
+      // 首先获取当前热度值
+      const { data: figureData, error: fetchError } = await supabase
+        .from('historical_figures')
+        .select('popularity_score')
+        .eq('id', figureId)
+        .single()
 
-    return { data, error }
+      if (fetchError) throw fetchError
+
+      // 更新热度值（增加1）
+      const { data, error } = await supabase
+        .from('historical_figures')
+        .update({ 
+          popularity_score: (figureData?.popularity_score || 0) + 1,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', figureId)
+        .select()
+
+      return { data, error }
+    } catch (error) {
+      console.error('更新人物热度失败:', error)
+      return { data: null, error }
+    }
   }
 
   // 获取时间线数据
