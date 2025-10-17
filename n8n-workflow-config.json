@@ -1,0 +1,91 @@
+{
+  "n8n_webhook_workflow_config": {
+    "description": "AI聊天机器人n8n工作流配置指南",
+    "nodes": [
+      {
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "ai-chat",
+          "responseMode": "responseNode"
+        },
+        "notes": "确保响应模式设置为'responseNode'"
+      },
+      {
+        "name": "AI Processing",
+        "type": "n8n-nodes-base.code",
+        "parameters": {
+          "jsCode": "// 处理用户输入并生成AI回复\nconst userInput = $input.first().json.input;\n\n// 这里添加您的AI处理逻辑\nconst aiResponse = `您的问题是：${userInput}\\n\\nAI回答：这是一个测试回复。`;\n\n// 返回处理结果\nreturn [{ json: { response: aiResponse, status: 'success' } }];"
+        },
+        "notes": "这里可以使用OpenAI节点、自定义代码节点或其他AI服务"
+      },
+      {
+        "name": "Respond to Webhook",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "parameters": {
+          "responseMode": "responseNode",
+          "responseData": "{{ $json }}",
+          "responseCode": 200,
+          "options": {}
+        },
+        "notes": "关键配置：responseData必须包含有效的JSON"
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "AI Processing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Processing": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "respond_to_webhook_config_examples": [
+      {
+        "name": "简单响应示例",
+        "responseData": "{\n  \"response\": \"{{ $json.input }} 的AI回答内容\",\n  \"status\": \"success\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\"\n}"
+      },
+      {
+        "name": "完整响应示例", 
+        "responseData": "{\n  \"response\": \"{{ $json.response || '收到您的消息' }}\",\n  \"original_input\": \"{{ $json.input }}\",\n  \"sessionId\": \"{{ $json.sessionId }}\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\",\n  \"status\": \"success\"\n}"
+      }
+    ],
+    "common_errors_and_solutions": [
+      {
+        "error": "Invalid JSON in 'Response Body' field",
+        "solution": "检查Respond to Webhook节点的responseData字段，确保是有效的JSON格式，使用双引号而不是单引号"
+      },
+      {
+        "error": "Unused Respond to Webhook node found",
+        "solution": "确保Webhook节点的响应输出端口连接到Respond to Webhook节点"
+      },
+      {
+        "error": "Unexpected end of JSON input",
+        "solution": "n8n返回了非JSON内容，检查工作流是否有错误或返回了HTML错误页面"
+      }
+    ],
+    "testing_steps": [
+      "1. 在n8n中创建简单的工作流：Webhook → Respond to Webhook",
+      "2. 在Respond to Webhook节点中设置简单的JSON响应",
+      "3. 激活工作流",
+      "4. 使用Postman或curl测试API端点",
+      "5. 确认返回有效的JSON响应后再添加AI处理逻辑"
+    ]
+  }
+}

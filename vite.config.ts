@@ -12,6 +12,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    proxy: {
+      '/api/ai-chat': {
+        target: 'https://yjw123456.app.n8n.cloud',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ai-chat/, '/webhook/ai-chat')
+      }
+    }
   }
 }) as UserConfig

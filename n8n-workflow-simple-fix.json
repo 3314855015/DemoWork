@@ -1,0 +1,67 @@
+{
+  "name": "AI Chat Workflow - Fixed Version",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-chat"
+      }
+    },
+    {
+      "name": "AI Model",
+      "type": "n8n-nodes-base.aiLanguageModel",
+      "parameters": {
+        "model": "gpt-4",
+        "prompt": "{{$json.input}}",
+        "systemMessage": "你是一个有用的AI助手，专门回答关于历史人物的问题。"
+      }
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "parameters": {
+        "responseMode": "responseNode",
+        "responseData": {
+          "response": "{{$json.choices[0].message.content}}",
+          "status": "success",
+          "timestamp": "{{$now}}",
+          "sessionId": "{{$executionId}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Model"
+          }
+        ]
+      ]
+    },
+    "AI Model": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook"
+          }
+        ]
+      ]
+    }
+  },
+  "notes": {
+    "fixes": [
+      "修复了response字段：从{{$json}}改为{{$json.choices[0].message.content}}，避免返回[object Object]",
+      "修复了sessionId字段：使用{{$executionId}}确保每次执行都有唯一ID",
+      "确保AI模型节点的输出正确传递到Respond to Webhook节点"
+    ],
+    "debug_tips": [
+      "在n8n编辑器中测试AI模型节点，查看其实际输出结构",
+      "如果AI模型节点输出结构不同，调整response字段的引用路径",
+      "例如：如果输出是{{$json.result}}，则改为{{$json.result}}"
+    ]
+  }
+}
