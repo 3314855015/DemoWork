@@ -45,6 +45,14 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '人物详情'
     }
+  },
+  {
+    path: '/ai-chat',
+    name: 'AIChat',
+    component: () => import('@/views/AIChat.vue'),
+    meta: {
+      title: 'AI历史人物聊天'
+    }
   }
 ]
 

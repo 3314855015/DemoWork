@@ -26,6 +26,12 @@
           @click="$router.push('/about')"
         />
         <FeatureCard
+          title="AI历史人物聊天"
+          description="与历史名人进行智能对话"
+          icon="🤖"
+          @click="$router.push('/ai-chat')"
+        />
+        <FeatureCard
           title="主题切换"
           description="演示全局状态管理"
           icon="🎨"
