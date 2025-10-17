@@ -37,16 +37,23 @@
               type="text"
               placeholder="请输入历史人物名和您的问题"
               @keyup.enter="sendMessage"
+              :disabled="isLoading"
             />
             <button 
               @click="sendMessage"
-              :disabled="!inputText.trim()"
+              :disabled="!inputText.trim() || isLoading"
               class="send-button"
             >
-              发送
+              {{ isLoading ? '处理中...' : '发送' }}
             </button>
           </div>
-          <p class="hint">提示：输入格式为"人物名，问题内容"，例如"秦始皇，统一六国的意义是什么？"</p>
+          <p class="hint">提示：输入格式为：人物名</p>
+        </div>
+
+        <!-- 加载提示 -->
+        <div v-if="isLoading" class="loading-indicator">
+          <div class="loading-spinner"></div>
+          <span>AI正在思考中，请稍候...</span>
         </div>
       </div>
     </div>
@@ -73,6 +80,7 @@ interface ChatMessage {
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
 const isConnected = ref(false)
+const isLoading = ref(false)
 const lastCheckTime = ref<number>(0)
 const sessionId = ref<string>('')
 const messagesContainer = ref<HTMLElement>()
@@ -91,7 +99,10 @@ const scrollToBottom = async () => {
 
 // 发送消息
 const sendMessage = async () => {
-  if (!inputText.value.trim()) return
+  if (!inputText.value.trim() || isLoading.value) return
+
+  // 设置加载状态
+  isLoading.value = true
 
   const userMessage: ChatMessage = {
     id: Date.now().toString(),
@@ -134,6 +145,9 @@ const sendMessage = async () => {
     
     // 错误消息后也滚动到底部
     await scrollToBottom()
+  } finally {
+    // 无论成功或失败，都清除加载状态
+    isLoading.value = false
   }
 }
 
@@ -278,7 +292,7 @@ onMounted(() => {
   // 添加欢迎消息
   messages.value.push({
     id: Date.now().toString(),
-    text: '欢迎使用AI历史人物聊天机器人！请输入历史人物名和您的问题，例如："孔子，什么是仁？"',
+    text: '欢迎使用AI历史人物聊天机器人！请输入历史人物名',
     isUser: false,
     timestamp: new Date()
   })
@@ -663,10 +677,63 @@ router.afterEach((to, from) => {
   color: #cbd5e0;
 }
 
+/* 加载指示器样式 */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 10px;
+  margin: 1rem 2rem;
+  border-left: 4px solid #667eea;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-indicator span {
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 深色主题下的加载指示器 */
+.dark-theme .loading-indicator {
+  background: rgba(129, 140, 248, 0.1);
+  border-left-color: #818cf8;
+}
+
+.dark-theme .loading-spinner {
+  border: 2px solid #4a5568;
+  border-top: 2px solid #818cf8;
+}
+
+.dark-theme .loading-indicator span {
+  color: #e2e8f0;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .chat-area {
     height: 500px;
+  }
+  
+  .loading-indicator {
+    margin: 1rem;
+    padding: 1rem;
   }
 }
 
