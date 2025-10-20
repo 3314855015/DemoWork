@@ -4,7 +4,7 @@
   functions = "netlify/functions"
 
 [functions]
-  ai-chat.timeout = 30
+  ai-chat.timeout = 180
 
 [[redirects]]
   from = "/api/ai-chat"

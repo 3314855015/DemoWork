@@ -32,7 +32,7 @@ export default async function handler(event, context) {
     
     // 设置超时控制
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('请求超时')), 25000); // 25秒超时
+      setTimeout(() => reject(new Error('请求超时')), 170000); // 170秒超时
     });
     
     const fetchPromise = fetch(n8nWebhookUrl, {
