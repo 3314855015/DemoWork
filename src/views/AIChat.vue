@@ -83,7 +83,7 @@ const lastRequestTime = ref<number>(0)
 const requestCooldown = 1000 // 1秒冷却时间
 const responseCache = ref<Map<string, string>>(new Map())
 const requestCount = ref<number>(0)
-const maxRequestsPerMinute = 2 // 每分钟最大请求数
+const maxRequestsPerMinute = 6 // 每分钟最大请求数
 const requestTimestamps = ref<number[]>([])
 
 // 输入验证和内容过滤
