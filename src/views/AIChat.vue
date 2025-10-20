@@ -58,7 +58,11 @@
       </div>
     </div>
 
-
+    <!-- 连接状态 -->
+    <div class="connection-status" :class="{ connected: isConnected }">
+      <span class="status-dot"></span>
+      {{ isConnected ? '已连接到AI服务' : '正在连接AI服务...' }}
+    </div>
   </div>
 </template>
 
@@ -75,76 +79,12 @@ interface ChatMessage {
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
+const isConnected = ref(false)
 const isLoading = ref(false)
+const lastCheckTime = ref<number>(0)
 const sessionId = ref<string>('')
 const messagesContainer = ref<HTMLElement>()
-const messageRefs = ref<Record<string, Element | null>>({})
-const lastRequestTime = ref<number>(0)
-const requestCooldown = 1000 // 1秒冷却时间
-const responseCache = ref<Map<string, string>>(new Map())
-const requestCount = ref<number>(0)
-const maxRequestsPerMinute = 6 // 每分钟最大请求数
-const requestTimestamps = ref<number[]>([])
-
-// 输入验证和内容过滤
-const validateInput = (input: string): { isValid: boolean; message?: string } => {
-  // 检查输入长度
-  if (input.length > 500) {
-    return { isValid: false, message: '输入内容过长，请控制在500字符以内' }
-  }
-  
-  // 检查空输入
-  if (!input.trim()) {
-    return { isValid: false, message: '请输入有效内容' }
-  }
-  
-  // 检查恶意模式（简单防护）
-  const maliciousPatterns = [
-    /script/i,
-    /javascript:/i,
-    /onload=/i,
-    /onerror=/i,
-    /eval\(/i,
-    /document\./i,
-    /window\./i,
-    /alert\(/i,
-    /prompt\(/i,
-    /confirm\(/i
-  ]
-  
-  for (const pattern of maliciousPatterns) {
-    if (pattern.test(input)) {
-      return { isValid: false, message: '输入包含不安全内容' }
-    }
-  }
-  
-  // 检查重复字符（防止垃圾内容）
-  const repeatedChars = /(.)\1{10,}/ // 连续10个相同字符
-  if (repeatedChars.test(input)) {
-    return { isValid: false, message: '输入内容异常' }
-  }
-  
-  return { isValid: true }
-}
-
-// 检查速率限制
-const checkRateLimit = (): boolean => {
-  const now = Date.now()
-  const oneMinuteAgo = now - 60000
-  
-  // 清理过期的请求时间戳
-  requestTimestamps.value = requestTimestamps.value.filter(timestamp => timestamp > oneMinuteAgo)
-  
-  // 检查是否超过限制
-  if (requestTimestamps.value.length >= maxRequestsPerMinute) {
-    console.warn('速率限制：每分钟请求次数超过限制')
-    return false
-  }
-  
-  // 记录当前请求时间
-  requestTimestamps.value.push(now)
-  return true
-}
+const messageRefs = ref<Record<string, HTMLElement>>({})
 
 // 自动滚动到最新消息
 const scrollToBottom = async () => {
@@ -159,55 +99,7 @@ const scrollToBottom = async () => {
 
 // 发送消息
 const sendMessage = async () => {
-  const now = Date.now()
-  
-  // 检查冷却时间
-  if (now - lastRequestTime.value < requestCooldown) {
-    console.log('请求过于频繁，请稍后再试')
-    const errorMessage: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      text: '请求过于频繁，请稍后再试',
-      isUser: false,
-      timestamp: new Date()
-    }
-    messages.value.push(errorMessage)
-    await scrollToBottom()
-    return
-  }
-  
-  // 检查速率限制
-  if (!checkRateLimit()) {
-    console.error('请求频率过高，请稍后再试')
-    const errorMessage: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      text: '请求频率过高，请稍后再试（每分钟最多10次）',
-      isUser: false,
-      timestamp: new Date()
-    }
-    messages.value.push(errorMessage)
-    await scrollToBottom()
-    return
-  }
-  
   if (!inputText.value.trim() || isLoading.value) return
-  
-  // 验证输入内容
-  const validation = validateInput(inputText.value)
-  if (!validation.isValid) {
-    console.error('输入验证失败:', validation.message)
-    const errorMessage: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      text: validation.message || '输入内容不符合要求',
-      isUser: false,
-      timestamp: new Date()
-    }
-    messages.value.push(errorMessage)
-    await scrollToBottom()
-    return
-  }
-  
-  // 更新最后请求时间
-  lastRequestTime.value = now
 
   // 设置加载状态
   isLoading.value = true
@@ -227,22 +119,6 @@ const sendMessage = async () => {
   await scrollToBottom()
 
   try {
-    // 检查缓存
-    const cachedResponse = responseCache.value.get(userInput)
-    if (cachedResponse) {
-      console.log('使用缓存响应')
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: cachedResponse,
-        isUser: false,
-        timestamp: new Date()
-      }
-      messages.value.push(aiMessage)
-      await scrollToBottom()
-      isLoading.value = false
-      return
-    }
-
     // 调用实际的n8n服务
     const response = await callN8nService(userInput)
     
@@ -254,9 +130,6 @@ const sendMessage = async () => {
     }
 
     messages.value.push(aiMessage)
-    
-    // 缓存响应结果
-    responseCache.value.set(userInput, response)
     
     // AI回复后再次滚动到底部
     await scrollToBottom()
@@ -278,26 +151,15 @@ const sendMessage = async () => {
   }
 }
 
-// 获取API端点URL（根据环境动态配置）
-const getApiUrl = (): string => {
-  // 开发环境使用本地API代理
-  if (import.meta.env.DEV) {
-    return '/api/ai-chat'
-  }
-  // 生产环境使用Netlify函数路径
-  return `${window.location.origin}/.netlify/functions/ai-chat`
-}
-
-// 调用API代理服务（解决跨域问题）
+// 调用本地API代理服务（解决跨域问题）
 const callN8nService = async (userInput: string): Promise<string> => {
   try {
-    // 使用动态配置的API端点
-    const apiUrl = getApiUrl()
-    console.log('API端点:', apiUrl, '环境:', import.meta.env.MODE)
+    // 使用本地API代理端点，避免跨域问题
+    const localApiUrl = '/api/ai-chat'
     
-    console.log('通过API代理发送请求:', { message: userInput })
+    console.log('通过本地API代理发送请求:', { message: userInput })
     
-    const response = await fetch(apiUrl, {
+    const response = await fetch(localApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -371,9 +233,58 @@ const formatTime = (timestamp: Date): string => {
   })
 }
 
+// 检查本地API服务连接状态（优化版，减少频繁检查）
+const checkN8nConnection = async () => {
+  try {
+    const localApiUrl = '/api/ai-chat'
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000) // 缩短超时时间
+    
+    // 使用轻量级测试数据
+    const response = await fetch(localApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        input: 'ping',
+        timestamp: new Date().toISOString(),
+        sessionId: sessionId.value || 'connection-check'
+      }),
+      signal: controller.signal
+    })
+    
+    clearTimeout(timeoutId)
+    isConnected.value = response.ok
+    lastCheckTime.value = Date.now()
+    
+    if (response.ok) {
+      console.log('✅ API服务连接正常')
+      
+      // 尝试获取响应数据以更新sessionId
+      try {
+        const data = await response.json()
+        if (data.sessionId && data.sessionId !== sessionId.value) {
+          sessionId.value = data.sessionId
+          console.log('连接检查中更新sessionId:', sessionId.value)
+        }
+      } catch (e) {
+        // 忽略JSON解析错误，连接状态检查是主要的
+      }
+    }
+  } catch (error) {
+    // 区分超时错误和其他错误
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('API连接检查超时')
+    } else {
+      console.error('API服务连接检查失败:', error)
+    }
+    isConnected.value = false
+    lastCheckTime.value = Date.now()
+  }
+}
 
-
-// 组件挂载时初始化
+// 组件挂载时检查连接状态
 onMounted(() => {
   // 页面加载时滚动到顶部
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -390,6 +301,24 @@ onMounted(() => {
   setTimeout(() => {
     scrollToBottom()
   }, 100)
+  
+  // 延迟检查连接状态，避免页面加载时立即检查
+  setTimeout(() => {
+    checkN8nConnection()
+  }, 1000)
+  
+  // 连接检查逻辑 - 使用固定间隔，避免频繁检查
+  const checkInterval = 60000 // 60秒检查一次
+  
+  const interval = setInterval(() => {
+    // 只有在未连接状态或长时间未检查时才进行检查
+    if (!isConnected.value || Date.now() - lastCheckTime.value > 120000) {
+      checkN8nConnection()
+    }
+  }, checkInterval)
+  
+  // 组件卸载时清除定时器
+  return () => clearInterval(interval)
 })
 
 // 监听路由变化，确保页面切换时滚动到顶部
@@ -641,6 +570,36 @@ router.afterEach((to, from) => {
   font-size: 0.9rem;
 }
 
+.connection-status {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e53e3e;
+  animation: pulse 2s infinite;
+}
+
+.connection-status.connected .status-dot {
+  background: #38a169;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 /* 深色主题适配 */
 .dark-theme .ai-chat {
@@ -671,7 +630,10 @@ router.afterEach((to, from) => {
   border-color: #818cf8;
 }
 
-
+.dark-theme .connection-status {
+  background: rgba(30, 41, 59, 0.9);
+  color: #f1f5f9;
+}
 
 /* 深色主题下的历史人物信息渲染器样式 */
 .dark-theme .ai-message .message-text :deep(.section-title) {
