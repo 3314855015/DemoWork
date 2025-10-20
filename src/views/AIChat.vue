@@ -284,8 +284,8 @@ const getApiUrl = (): string => {
   if (import.meta.env.DEV) {
     return '/api/ai-chat'
   }
-  // 生产环境使用绝对路径
-  return `${window.location.origin}/api/ai-chat`
+  // 生产环境使用Netlify函数路径
+  return `${window.location.origin}/.netlify/functions/ai-chat`
 }
 
 // 调用API代理服务（解决跨域问题）
