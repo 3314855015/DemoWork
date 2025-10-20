@@ -4,9 +4,8 @@
 
 [[redirects]]
   from = "/api/ai-chat"
-  to = "https://yjw123456.app.n8n.cloud/webhook/ai-chat"
+  to = "/.netlify/functions/ai-chat"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/*"
