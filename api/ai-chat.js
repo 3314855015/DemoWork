@@ -10,13 +10,15 @@ export default async function handler(request) {
   try {
     const n8nWebhookUrl = 'https://yjw123456.app.n8n.cloud/webhook/ai-chat'
     
-    console.log('代理请求到n8n:', request.body)
+    console.log('开始代理请求到n8n:', new Date().toISOString())
+    console.log('请求数据:', JSON.stringify(request.body).substring(0, 200) + '...')
     
-    // 设置超时控制
+    // 设置超时控制 - 调整为60秒，避免平台限制
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('请求超时')), 170000); // 170秒超时
+      setTimeout(() => reject(new Error('请求超时')), 60000); // 60秒超时
     });
     
+    const startTime = Date.now()
     const fetchPromise = fetch(n8nWebhookUrl, {
       method: 'POST',
       headers: {
@@ -26,7 +28,10 @@ export default async function handler(request) {
     })
 
     // 使用 Promise.race 实现超时控制
-    const response = await Promise.race([fetchPromise, timeoutPromise]);
+    const response = await Promise.race([fetchPromise, timeoutPromise])
+    const responseTime = Date.now() - startTime
+    
+    console.log(`n8n响应时间: ${responseTime}ms`, new Date().toISOString())
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -34,12 +39,14 @@ export default async function handler(request) {
       return new Response(JSON.stringify({ 
         error: 'n8n服务错误',
         status: response.status,
-        details: errorText
+        details: errorText,
+        responseTime: responseTime
       }), { status: response.status })
     }
 
     const data = await response.json()
-    console.log('n8n返回数据:', data)
+    console.log('n8n返回数据长度:', JSON.stringify(data).length)
+    console.log('数据处理完成:', new Date().toISOString())
     
     return new Response(JSON.stringify(data), { 
       status: 200,
