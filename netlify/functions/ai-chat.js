@@ -30,13 +30,21 @@ export default async function handler(event, context) {
     
     console.log('代理请求到n8n:', requestBody);
     
-    const response = await fetch(n8nWebhookUrl, {
+    // 设置超时控制
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('请求超时')), 25000); // 25秒超时
+    });
+    
+    const fetchPromise = fetch(n8nWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody)
     });
+
+    // 使用 Promise.race 实现超时控制
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -67,6 +75,21 @@ export default async function handler(event, context) {
     });
   } catch (error) {
     console.error('API代理错误:', error);
+    
+    // 处理超时错误
+    if (error.message === '请求超时') {
+      return new Response(JSON.stringify({ 
+        error: '请求超时',
+        message: 'AI服务响应时间过长，请稍后重试'
+      }), {
+        status: 504,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+    
     return new Response(JSON.stringify({ 
       error: '内部服务器错误',
       message: error.message 
