@@ -10,10 +10,7 @@
     },
     {
       "src": "api/ai-chat.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxDuration": 180
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -31,10 +28,5 @@
   "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/ai-chat.js": {
-      "maxDuration": 180
-    }
   }
 }
