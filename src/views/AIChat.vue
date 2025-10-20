@@ -295,9 +295,9 @@ const callN8nService = async (userInput: string): Promise<string> => {
     const apiUrl = getApiUrl()
     console.log('API端点:', apiUrl, '环境:', import.meta.env.MODE)
     
-    console.log('通过本地API代理发送请求:', { message: userInput })
+    console.log('通过API代理发送请求:', { message: userInput })
     
-    const response = await fetch(localApiUrl, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
