@@ -1,7 +1,5 @@
 // Netlify Function for AI Chat API
-const fetch = require('node-fetch');
-
-exports.handler = async function(event, context) {
+export default async function handler(event, context) {
   // 只允许 POST 请求
   if (event.httpMethod !== 'POST') {
     return {
@@ -59,4 +57,4 @@ exports.handler = async function(event, context) {
       })
     };
   }
-};
+}
