@@ -710,7 +710,7 @@ router.afterEach((to, from) => {
   100% { transform: rotate(360deg); }
 }
 
-/* 深色主题下的加载指示器 */
+/*深色主题下的加载指示器*/
 .dark-theme .loading-indicator {
   background: rgba(129, 140, 248, 0.1);
   border-left-color: #818cf8;
