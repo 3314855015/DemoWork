@@ -78,7 +78,7 @@ const inputText = ref('')
 const isLoading = ref(false)
 const sessionId = ref<string>('')
 const messagesContainer = ref<HTMLElement>()
-const messageRefs = ref<Record<string, HTMLElement | null>>({})
+const messageRefs = ref<Record<string, Element | null>>({})
 const lastRequestTime = ref<number>(0)
 const requestCooldown = 1000 // 1秒冷却时间
 const responseCache = ref<Map<string, string>>(new Map())
@@ -278,11 +278,22 @@ const sendMessage = async () => {
   }
 }
 
-// 调用本地API代理服务（解决跨域问题）
+// 获取API端点URL（根据环境动态配置）
+const getApiUrl = (): string => {
+  // 开发环境使用本地API代理
+  if (import.meta.env.DEV) {
+    return '/api/ai-chat'
+  }
+  // 生产环境使用绝对路径
+  return `${window.location.origin}/api/ai-chat`
+}
+
+// 调用API代理服务（解决跨域问题）
 const callN8nService = async (userInput: string): Promise<string> => {
   try {
-    // 使用本地API代理端点，避免跨域问题
-    const localApiUrl = '/api/ai-chat'
+    // 使用动态配置的API端点
+    const apiUrl = getApiUrl()
+    console.log('API端点:', apiUrl, '环境:', import.meta.env.MODE)
     
     console.log('通过本地API代理发送请求:', { message: userInput })
     
